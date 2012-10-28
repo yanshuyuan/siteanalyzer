@@ -29,6 +29,7 @@ int main(int argc, char **argv)
 {
     if(argc < 3) {
 	fprintf(stderr, "too few argument, 3 arguments expected.\n");
+	return 1;
     }
     char *url = argv[1];
     char *path = argv[2];

@@ -278,7 +278,7 @@ void gen_graphviz(webg_t *web_g)
     FILE *webg_fp = fopen("sitemap.dot", "w");
     if(webg_fp != NULL) {
         int i;
-        fprintf(webg_fp, "digraph\nwebgraph{\n");
+        fprintf(webg_fp, "digraph webgraph{\n");
         for(i = 0; i < web_g->vertex_size; i++) {
             fprintf(webg_fp, "%d;\n", web_g->vertex[i].index.vid); /* vid */
         }
@@ -315,7 +315,7 @@ void destroy_webg(webg_t *web_g)
 
 void printWebg(webg_t *web_g)
 {
-    FILE *webg_fp = fopen("graph.info", "w");
+    FILE *webg_fp = fopen("webgraph.dat", "w");
     if(webg_fp != NULL) {
         int i;
         fprintf(webg_fp, "%d\n", web_g->vertex_size);
@@ -333,9 +333,9 @@ void printWebg(webg_t *web_g)
         }
         fclose(webg_fp);
     } else {
-	fprintf(stderr, "Can't open file 'graph.info.'\n");
+	fprintf(stderr, "Can't open file 'webgraph.dat'.\n");
     }
-    FILE *dict_fp = fopen("dict.info", "w");
+    FILE *dict_fp = fopen("link.dat", "w");
     if(dict_fp != NULL) {
         int ix;
         for(ix = 0; ix < web_g->vertex_dict.size; ix++) {
@@ -353,6 +353,6 @@ void printWebg(webg_t *web_g)
         }
         fclose(dict_fp);
     } else {
-	fprintf(stderr, "Can't open file 'dict.info.'\n");
+	fprintf(stderr, "Can't open file 'link.dat'.\n");
     }
 }
