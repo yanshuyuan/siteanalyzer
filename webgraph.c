@@ -267,6 +267,9 @@ void calc_pagerank(webg_t *web_g)
 		}
 		pr_vector[i] = web_g->vertex[i].pr;
 	    }
+	    for(i = 0; i< web_g->vertex_size && flag; i++) {
+		web_g->vertex[i].pr = 0.0;
+	    }
 	}
 	free(pr_vector);
     }
