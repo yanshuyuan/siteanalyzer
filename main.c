@@ -17,7 +17,7 @@
 #include "webgraph.h"
 #include "http_url.h"
 
-#define MAX_THREADS 70
+#define MAX_THREADS 300
 
 
 thread_pool_t thread_pool;

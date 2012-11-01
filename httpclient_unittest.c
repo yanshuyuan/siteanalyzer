@@ -5,10 +5,11 @@
 
 int main(int argc, char **argv)
 {
+    char *host = "125.211.218.8";
+   char *path = "/techqq/zt/2007/firacn/topic_html/xsm.htm";
+   /*
    char *host = "10.205.42.139";
    char *path = "/techqq/a/20090423/000378.htm";
-   /*
-    char *host = "125.211.218.8";
 char *path = "/techqq/a/20120111/000508.htm";
 char *path = "/techqq/a/20121008/000013.htm";
     char *path = "/techqq/wlyx.htm";
