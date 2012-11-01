@@ -70,11 +70,11 @@ int crawler_crawl(link_crawler_t *crawler, char *url, list_t *link_list)
 		status = CRAWLER_UNKNOWN;
                 break;
             }
+	    http_disconnect(&crawler->http_client);
         } else {
             fprintf(stderr, "Http connect %s:%d failed.\n", http_url.host, port);
             status = CRAWLER_UNREACH;
         }
-	http_disconnect(&crawler->http_client);
     } else {
 	fprintf(stderr, "Unrecognize url: %s\n", url);
 	status = CRAWLER_UNKNOWN; 
