@@ -257,7 +257,9 @@ void calc_pagerank(webg_t *web_g)
 	    
 	    flag = web_g->vertex_size;
 	    for(i = 0, sum = 0; i < web_g->vertex_size; i++) {
+		/*
 		web_g->vertex[i].pr = web_g->vertex[i].pr * (1.0 - DAMPING_FACTOR) + DAMPING_FACTOR / web_g->vertex_size;
+		*/
 		sum += web_g->vertex[i].pr;
 	    }
 	    for(i = 0; i < web_g->vertex_size; i++) {

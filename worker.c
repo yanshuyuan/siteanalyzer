@@ -10,7 +10,10 @@ extern thread_counter_t global_lock;
 int check(char *buf)
 {
     int len = strlen(buf);
+/*
     const char *domain = "http://125.211.218.8/";
+*/
+    const char *domain = "http://1";
     const int domain_len = strlen(domain);
     if(len >= domain_len && !memcmp(buf, domain, domain_len) == 0) return 0;
     if((len > 5 && memcmp(buf + len - 5, ".html", 5) == 0)
@@ -163,7 +166,7 @@ void *do_crawler(void *arg)
         list_init(&link_list);
             /* check the path is already crawled */
                 /* crawl path */
-        printf("---------threadID: %d(%lu) crawler url: %s---------------\n", thread_arg->thread_item->id, thread_arg->thread_item->threadinfo, url);
+        printf("---------$$$$$threadID: %d(%lu) crawler url: %s---------------\n", thread_arg->thread_item->id, thread_arg->thread_item->threadinfo, url);
 	retval = crawler_crawl(&crawler, url, &link_list);
         if(retval == CRAWLER_OK) {
             /* enque crawled list */
@@ -202,12 +205,13 @@ void *do_crawler(void *arg)
             fprintf(stderr, "Error: crawler url '%s' failed.\n", url);
 	    
 	} else {
+	    timeout--;
         	printf("---------threadID: %d(%lu) crawler url: %s failed---------------\n", 
             			thread_arg->thread_item->id, thread_arg->thread_item->threadinfo, url);
             fprintf(stderr, "Error: crawler url '%s' failed.\n", url);
         }
         list_destroy(&link_list);
-    } while((retval == CRAWLER_TIMEOUT || retval == CRAWLER_FAILED || retval == CRAWLER_UNREACH) && timeout > 0);
+    } while((retval == CRAWLER_TIMEOUT || retval == CRAWLER_OVERFLOW || retval == CRAWLER_FAILED || retval == CRAWLER_UNREACH) && timeout > 0);
 
     printf("================================send post job============================\n");
     if(job_arg != NULL) { free(job_arg); }

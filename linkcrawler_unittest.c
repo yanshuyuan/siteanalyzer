@@ -25,12 +25,14 @@ int main(int argc, char **argv)
     list_t l;
     list_init(&l);
 	/*
+/techqq/a/20120618/000047.htm
     char *url1 = "http://125.211.218.8/techqq/a/20120626/000158.htm";
     char *url1 = "http://125.211.218.8/techqq/a/20060224/1.html";
     char *url1 = "http://125.211.218.8/techqq/a/20110926/000359.htm";
-	*/
-
     char *url1 = "http://125.211.218.8/techqq/a/20101109/000034.htm";
+    char *url1 = "http://125.211.218.8/techqq/a/20121007/000028.htm";
+	*/
+    char *url1 = argv[1];
     link_crawler_t crawler1;
     crawler_crawl(&crawler1, url1, &l);
     printList(&l);

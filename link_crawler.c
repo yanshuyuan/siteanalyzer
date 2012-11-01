@@ -17,6 +17,7 @@ int crawler_crawl(link_crawler_t *crawler, char *url, list_t *link_list)
         if(http_connect(&crawler->http_client, http_url.host, port) == CONNECT_OK) {
             int ecode, response_status; 
             const char *page = NULL;
+	    printf("%s\n", url);
             ecode = http_do_get(&crawler->http_client, path);
             switch(ecode) {
             case RESPONSE_OK:
@@ -41,6 +42,12 @@ int crawler_crawl(link_crawler_t *crawler, char *url, list_t *link_list)
                     status = CRAWLER_NONEED;
                 }
                 break;
+            case RESPONSE_OVERFLOW:
+                fprintf(stderr, "Request %s:%d%s do_get receive overflow.\n", 
+                		crawler->http_client.connection.host, 
+                		crawler->http_client.connection.port, path);
+                status = CRAWLER_OVERFLOW;
+		break;
             case RESPONSE_FAILED:
                 fprintf(stderr, "Request %s:%d%s do_get receive break.\n", 
                 		crawler->http_client.connection.host, 
