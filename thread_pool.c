@@ -86,7 +86,9 @@ void *thread_do_job(void *arg)
 	thread_counter_increase(&thread_info->thread_pool->job_done);
 	thread_counter_increase(&thread_info->thread_item->job_done);
     }
+	/*
     printf("=========threadID: %d run over========================\n", thread_info->thread_item->id);
+	*/
     free(thread_info);
     return 0;
 }

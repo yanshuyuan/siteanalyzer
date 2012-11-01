@@ -6,7 +6,7 @@
 #include <string.h>
 #include <strings.h>
 
-#define ENTITY_BODY_SIZE_DEFAULT 307200 /* 300K */
+#define ENTITY_BODY_SIZE_DEFAULT 819200 /* 819200 */
 #define HTTP_OK 200
 #define HTTP_CREATED 201 
 #define HTTP_ACCEPTED 202

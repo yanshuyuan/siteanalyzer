@@ -25,10 +25,10 @@
 
 typedef struct _network {
     int socketfd;
-    char host[64];
+    char host[256];
     int port;
     int len; /*buffer current len*/
-    char buffer[BUFFER_SIZE]; /*recv line buffer*/
+    char buffer[BUFFER_SIZE * 10]; /*recv line buffer*/
 } network_t;
 
 int open_tcp(network_t *network, char *hostname, int port);

@@ -5,7 +5,6 @@ int _check_protocol(char *protocol, int len)
     int i;
     for(i = 0; i < len; i++) {
 	if(!isalnum(protocol[i])) {
-	    printf("char[%d]: %c\n", i, protocol[i]);
 	    return 0;
 	}
     }
@@ -54,6 +53,7 @@ int http_url_parse_s(http_url_t *http_url, char *url)
 {
     bzero(http_url, sizeof(http_url_t));
     char *str, *cstr = url;
+    char *estr = url + strlen(url);
     str  = strstr(url, "://");
     /* protocol */
     if(str != NULL) {
@@ -69,7 +69,8 @@ int http_url_parse_s(http_url_t *http_url, char *url)
 	if( _check_host(cstr, str - cstr)) { /* contain port */
 	    memcpy(http_url->host, cstr, str - cstr);
 	    cstr = str + 1;
-	    str = strchrnul(cstr, '/'); /* copy port */
+	    str = strchr(cstr, '/'); /* copy port */
+	    str = str != NULL ? str : estr;
 	    if(_check_port(cstr, str - cstr)) {
 	        memcpy(http_url->port, cstr, str - cstr);
 	    } else {
@@ -80,7 +81,8 @@ int http_url_parse_s(http_url_t *http_url, char *url)
 	    return URL_HOST_UNRECOGNIZED;
 	}
     } else { /* no port */
-	str = strchrnul(cstr, '/');
+	str = strchr(cstr, '/'); /* copy port */
+	str = str != NULL ? str : estr;
 	if(_check_host(cstr, str - cstr)) {
 	    memcpy(http_url->host, cstr, str - cstr); /* copy host */
 	    cstr = str;
