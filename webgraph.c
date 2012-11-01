@@ -237,7 +237,7 @@ void calc_pagerank(webg_t *web_g)
     calc_degree(web_g);
     double *pr_vector;
     int i, flag = web_g->vertex_size;
-    double sum;
+    double sum, ssum;
     if((pr_vector = (double *) malloc(sizeof(double) * web_g->vertex_size)) != NULL) {
 	for(i = 0; i < web_g->vertex_size; i++) {
 	    pr_vector[i] = 1.0;
@@ -254,12 +254,12 @@ void calc_pagerank(webg_t *web_g)
 	    	    }
 		}
 	    }
-	    
+	    for(i = 0, ssum = 0; i < web_g->vertex_size; i++) {
+		ssum += pr_vector[i];
+	    }
 	    flag = web_g->vertex_size;
 	    for(i = 0, sum = 0; i < web_g->vertex_size; i++) {
-		/*
-		web_g->vertex[i].pr = web_g->vertex[i].pr * (1.0 - DAMPING_FACTOR) + DAMPING_FACTOR / web_g->vertex_size;
-		*/
+		web_g->vertex[i].pr = web_g->vertex[i].pr * (1.0 - DAMPING_FACTOR) + DAMPING_FACTOR * ssum / web_g->vertex_size;
 		sum += web_g->vertex[i].pr;
 	    }
 	    for(i = 0; i < web_g->vertex_size; i++) {
