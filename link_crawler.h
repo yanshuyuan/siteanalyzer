@@ -17,6 +17,7 @@
 #define CRAWLER_UNKNOWN 5
 #define CRAWLER_TIMEOUT 6
 #define CRAWLER_NULL 7
+#define CRAWLER_OVERFLOW 8
 
 typedef struct _link_crawler {
     http_client_t http_client;

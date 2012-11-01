@@ -10,12 +10,11 @@
 #include <stdlib.h>
 #include "http_protocol.h"
 
-
-
 #define RESPONSE_OK 0
 #define REQUEST_FAILED 1
 #define RESPONSE_FAILED 2
 #define RESPONSE_TIMEOUT 3
+#define RESPONSE_OVERFLOW 4
 
 typedef struct _http_client {
     network_t connection;

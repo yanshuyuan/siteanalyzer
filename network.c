@@ -4,6 +4,7 @@
 ** - 对网络socket的收发进行封装
 */
 #include "network.h"
+#include "assert.h"
 
 int open_tcp(network_t *network, char *hostname, int port) 
 {
@@ -48,12 +49,12 @@ int nsend(network_t *network, char *buf, int bytes)
 
 int nrecv(network_t *network, char *buf, int bytes)
 {
+    return recv(network->socketfd, buf, bytes, 0);
+/*
     int offset, rest, size = 0, recv_size;
     offset = bytes <= network->len ? bytes : network->len;
     rest = network->len - offset;
     memcpy(buf, network->buffer, offset);
-/*
-    strncat(buf, network->buffer, offset); */
     memmove(network->buffer, network->buffer + offset, rest); 
     network->buffer[rest] = '\0';
     network->len = rest;
@@ -62,45 +63,46 @@ int nrecv(network_t *network, char *buf, int bytes)
 
     recv_size = recv(network->socketfd, buf + offset, bytes - offset, 0);
 	
-    /* if recv failed, but copy buffer size success need return */
     size += recv_size >= 0 ? recv_size : 0;
-    /* if recv size > 0, then size > 0, so return size */
     return size > 0 ? size : 
-	/* if size == 0 may be recv failed or recv over, but if recv_size == 0 then recv over*/
 		(recv_size == 0 ? recv_size : 	
-	/*but recv_size < 0, we need check timeout or recv_error*/
 			(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN ? RECV_TIMEOUT : RECV_ERROR));
+*/
 }
 
 int recv_line(network_t *network, char *buf, int limit)
 {
-    char *p_delm = NULL;
+    char *p_delm = NULL, *s_offset = NULL;
     /*  size: a line total bytes
-	b_size: network->buffer now contain character
-	rest: length belongs to next line but recv in this nrecv
-	offset: first \n pointer in this recv
+        b_size: network->buffer now contain character
+        rest: length belongs to next line but recv in this nrecv
+        offset: first \n pointer in this recv
     */
     int size = 0, b_size = network->len, rest, offset;
-    
+    int i;
+
     bzero(buf, limit);
     do {
-	/* copy network->buffer data to buf, if a line enough return */
-    	p_delm = strchr(network->buffer, '\n');
-	offset = p_delm != NULL ? p_delm - network->buffer + 1 : network->len;
-	rest = b_size - offset;
-	if(size > limit) { return -1; }
-	memcpy(buf + size, network->buffer, offset);
-	/*strncat(buf, network->buffer, offset); */
-	if(p_delm != NULL) { 
-	    memmove(network->buffer, p_delm + 1, rest); 
-	    network->buffer[rest] = '\0';
-	}
-	network->len = rest;
-	size += offset;
-	if(rest > 0) { return size; }
-	bzero(network->buffer, BUFFER_SIZE);
-	/* if a line not enough, go on read */
+        /* copy network->buffer data to buf, if a line enough return */
+        p_delm = strchr(network->buffer, '\n');
+        offset = p_delm != NULL ? (p_delm - network->buffer + 1 > limit - size ? limit - size : p_delm - network->buffer + 1) 
+				: (network->len > limit - size ? limit - size : network->len);
+        rest = network->len - offset;
+        if(size > limit) {
+            return -1;
+        }
+        memcpy(buf + size, network->buffer, offset);
+	s_offset = network->buffer + offset;
+        memmove(network->buffer, s_offset, rest);
+        network->buffer[rest] = '\0';
+        network->len = rest;
+        size += offset;
+	assert(size <= limit);
+        if(size == limit || rest > 0) { return size; }
+        bzero(network->buffer, BUFFER_SIZE);
+        /* if a line not enough, go on read */
         b_size = nrecv(network, network->buffer, BUFFER_SIZE);
+        network->len = b_size > 0 ? b_size : 0;
     } while(b_size > 0);
 
     return b_size < 0 ? b_size : size;
