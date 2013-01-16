@@ -6,6 +6,7 @@ extern ts_queue_t urlqueue;
 extern webg_t webgraph;
 extern thread_counter_t thread_idle_count;
 extern thread_counter_t global_lock;
+extern char domain[1024];
 
 int check(char *buf)
 {
@@ -13,7 +14,6 @@ int check(char *buf)
 /*
     const char *domain = "http://125.211.218.8/";
 */
-    const char *domain = "http://1";
     const int domain_len = strlen(domain);
     if(len >= domain_len && !memcmp(buf, domain, domain_len) == 0) return 0;
     if((len > 5 && memcmp(buf + len - 5, ".html", 5) == 0)

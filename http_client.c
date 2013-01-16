@@ -31,7 +31,7 @@ int http_do_get(http_client_t *http_client, char *path)
 {
     char http_request[REQ_SIZE];
     bzero(http_request, REQ_SIZE);
-    int timeout, size; /* send or recv timeout more than 3 times will stop */
+    int size; /* send or recv timeout more than 3 times will stop */
 	
     sprintf(http_request, "GET %s HTTP/1.0\r\n"
 			"Host: %s\r\n"
@@ -40,11 +40,7 @@ int http_do_get(http_client_t *http_client, char *path)
 				"| ari/535.11\r\n"
 			"Content-Type: application/x-www-form-urlencoded\r\n\r\n", path, http_client->connection.host);
 
-    timeout = 3;
-    do {
-        size = nsend(&http_client->connection, http_request, strlen(http_request));
-        timeout--;
-    } while(size < 0 && timeout);
+    size = nsend(&http_client->connection, http_request, strlen(http_request));
 
     if(size < 0) {
 	fprintf(stderr, "Http Request failed, error code: %d\n", size);
@@ -55,39 +51,45 @@ int http_do_get(http_client_t *http_client, char *path)
     http_res_t *response = &http_client->response;
    
     int entity_body_size, recv_body_length = 0;
+    entity_body_size = ENTITY_BODY_SIZE_DEFAULT;
     
-    int offset = 0;
     /* recv http response */
-    timeout = 3;
     response->enti_body.buffer = (char *) malloc(ENTITY_BODY_SIZE_DEFAULT);
     if(response->enti_body.buffer == NULL) {
         response->enti_body.len = 0;
         fprintf(stderr, "Error: allocate memory failed in func 'do_get'.\n");
         return RESPONSE_FAILED;
     } else {
-        response->enti_body.len = ENTITY_BODY_SIZE_DEFAULT;
-        bzero(response->enti_body.buffer, ENTITY_BODY_SIZE_DEFAULT);
+        response->enti_body.len = entity_body_size;
+        bzero(response->enti_body.buffer, entity_body_size);
 
         do {
             bzero(buf, BUFFER_SIZE);
             size = nrecv(&http_client->connection, buf, LIMIT);
             if(size > 0) {
-                if(recv_body_length + size > ENTITY_BODY_SIZE_DEFAULT) {
-                    return RESPONSE_FAILED;
+                if(recv_body_length + size > entity_body_size) {
+		    entity_body_size *= 2;
+		    response->enti_body.buffer = (char *)realloc(response->enti_body.buffer, entity_body_size);
+		    if(response->enti_body.buffer == NULL) {
+			response->enti_body.len = 0;
+                        return RESPONSE_FAILED;
+		    } else {
+			response->enti_body.len =entity_body_size;
+		    }
+		
                 }
-                timeout = 3;
                 memcpy(response->enti_body.buffer + recv_body_length, buf, size);
                 recv_body_length += size;
             } else if(size == 0) {
 		response->enti_body.buffer[recv_body_length] = '\0';
-                break;
+		return RESPONSE_OK;
             }else {
-                timeout--;
+		return RESPONSE_FAILED;
             }
-        } while(timeout); 
+        } while(1); 
     }
     
-    return size < 0 ? RESPONSE_FAILED : RESPONSE_OK;
+    return RESPONSE_FAILED;
 }
 
 int http_response_status(http_client_t *http_client)
