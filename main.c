@@ -15,8 +15,9 @@
 #include "ts_queue.h"
 #include "worker.h"
 #include "webgraph.h"
+#include "http_url.h"
 
-#define MAX_THREADS 70
+#define MAX_THREADS 300
 
 
 thread_pool_t thread_pool;
@@ -24,6 +25,7 @@ thread_counter_t global_lock;
 ts_queue_t urlqueue;
 sem_t work_sem;
 webg_t webgraph;
+char domain[1024];
 
 int main(int argc, char **argv)
 {
@@ -33,6 +35,10 @@ int main(int argc, char **argv)
     }
     char *url = argv[1];
     char *path = argv[2];
+    http_url_t http_url;
+    http_url_parse_s(&http_url, url);
+    if(strlen(http_url.protocol) != 0) sprintf(domain, "%s://", http_url.protocol);
+    strcat(domain, http_url.host);
 
     init_webg(&webgraph);
     sem_init(&work_sem, 0, 0);
